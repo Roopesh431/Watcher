@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Watcher Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <aside>
+    <h2>◉ Watcher</h2>
+    <p>Documentation Agent</p>
+    <a href="/">Overview</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#output">Run output</a>
+    <p class="note">GitHub changes → AI documentation → reviewable updates.</p>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <small>DEVELOPER TOOLING</small>
+        <h1>Documentation Command Center</h1>
+        <p>Keep your README aligned with code changes.</p>
+      </div>
+      <span id="connection">Connecting...</span>
+    </header>
+
+    <section class="metrics">
+      <article><small>Repository</small><h3 id="repo-metric">Not set</h3></article>
+      <article><small>Workflow status</small><h3 id="run-status">Idle</h3></article>
+      <article><small>Exit code</small><h3 id="exit-code">—</h3></article>
+    </section>
+
+    <section class="panel" id="workflow">
+      <h2>Configure workflow</h2>
+
+      <label for="repo">GitHub repository</label>
+      <input id="repo" placeholder="owner/name">
+
+      <label for="readme">README path</label>
+      <input id="readme" value="Readme.md">
+
+      <label for="interval">Polling interval in seconds</label>
+      <input id="interval" type="number" min="10" max="3600" value="30">
+
+      <label class="check">
+        <input type="checkbox" id="dry-run" checked>
+        Preview mode — do not publish changes
+      </label>
+
+      <div class="actions">
+        <button id="once">Process latest commit once</button>
+        <button id="watch">Start continuous watch</button>
+      </div>
+    </section>
+
+    <section class="panel" id="output">
+      <h2>Run output</h2>
+      <button id="refresh">Refresh</button>
+      <pre id="logs">Waiting for backend...</pre>
+    </section>
+  </main>
+
+  <div id="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
