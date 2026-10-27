@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F5F2EA">
+  <title>Watcher — Engineering Workspace</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a href="/" class="brand" aria-label="Watcher home">
+      <span class="brand-mark">W<span>.</span></span>
+      <span class="brand-copy">
+        <strong>watcher</strong>
+        <small>ENGINEERING TOOLS</small>
+      </span>
+    </a>
+
+    <div class="sidebar-section">
+      <span class="section-label">WORKSPACE</span>
+      <a href="/" class="nav-link active">
+        <span class="nav-icon">◫</span>
+        Overview
+        <span class="nav-indicator"></span>
+      </a>
+      <a href="#workflow" class="nav-link">
+        <span class="nav-icon">⌘</span>
+        Workflow
+      </a>
+      <a href="#output" class="nav-link">
+        <span class="nav-icon">≡</span>
+        Run output
+      </a>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-rule"></div>
+      <div class="agent-identity">
+        <span class="agent-avatar">W</span>
+        <span>
+          <strong>Documentation agent</strong>
+          <small>Repository watcher</small>
+        </span>
+      </div>
+      <p class="sidebar-note">
+        Track code changes.<br>
+        Keep documentation in sync.
+      </p>
+      <div class="sidebar-version">
+        <span class="status-dot"></span>
+        Local workspace
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="breadcrumbs">
+        <span>Workspace</span>
+        <span class="breadcrumb-slash">/</span>
+        <strong>Overview</strong>
+      </div>
+
+      <div class="topbar-right">
+        <span class="topbar-label">WATCHER / DOCS</span>
+        <span id="connection" class="connection">
+          <span class="connection-dot"></span>
+          Connecting...
+        </span>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <section class="intro">
+        <div class="intro-copy">
+          <div class="eyebrow">
+            <span class="eyebrow-line"></span>
+            REPOSITORY INTELLIGENCE
+          </div>
+          <h1>Documentation,<br><em>kept in sync.</em></h1>
+          <p>
+            Watch code evolve. Turn repository changes into
+            reviewable documentation updates.
+          </p>
+        </div>
+
+        <div class="intro-stamp" aria-hidden="true">
+          <span class="stamp-symbol">W</span>
+          <span class="stamp-caption">OBSERVE<br>UNDERSTAND<br>DOCUMENT</span>
+        </div>
+      </section>
+
+      <section class="repository-strip" aria-label="Repository status">
+        <div class="repo-main">
+          <div class="repo-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 3.75h7l4.25 4.5v12H7a2 2 0 0 1-2-2v-12a2.5 2.5 0 0 1 2-2.5Z"
+                stroke="currentColor" stroke-width="1.5"/>
+              <path d="M14 4v5h4M8.5 13h6M8.5 16.5h6"
+                stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="repo-details">
+            <span class="field-caption">ACTIVE REPOSITORY</span>
+            <h2 id="repo-metric">Not set</h2>
+            <div class="repo-meta">
+              <span class="branch-mark">⑂</span>
+              <span>GitHub repository</span>
+              <span class="meta-separator">·</span>
+              <span>README tracking</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="repo-status">
+          <span class="field-caption">WORKFLOW STATE</span>
+          <div class="state-line">
+            <span id="run-indicator" class="state-indicator"></span>
+            <strong id="run-status">Idle</strong>
+          </div>
+        </div>
+
+        <div class="repo-exit">
+          <span class="field-caption">EXIT CODE</span>
+          <strong id="exit-code" class="exit-value">—</strong>
+        </div>
+      </section>
+
+      <div class="section-heading">
+        <div>
+          <span class="section-index">01</span>
+          <h2>Configure workflow</h2>
+        </div>
+        <span class="heading-note">SET YOUR REPOSITORY PARAMETERS</span>
+      </div>
+
+      <section class="workspace-grid" id="workflow">
+        <div class="config-panel">
+          <div class="panel-topline">
+            <span class="panel-kicker">CONFIGURATION</span>
+            <span class="panel-number">W / 01</span>
+          </div>
+
+          <div class="form-intro">
+            <h3>Define your source.</h3>
+            <p>Choose the repository and documentation file to monitor.</p>
+          </div>
+
+          <label for="repo">GitHub repository</label>
+          <div class="input-wrap">
+            <span class="input-prefix">↗</span>
+            <input id="repo" placeholder="owner/repository" autocomplete="off">
+          </div>
+          <p class="field-hint">Use the format owner/repository.</p>
+
+          <label for="readme">Documentation path</label>
+          <input id="readme" value="Readme.md" spellcheck="false">
+          <p class="field-hint">Path to the README file in the repository.</p>
+
+          <label for="interval">Polling interval</label>
+          <div class="interval-wrap">
+            <input id="interval" type="number" min="10" max="3600" value="30">
+            <span>SECONDS</span>
+          </div>
+          <p class="field-hint">How often continuous watch checks for changes.</p>
+
+          <div class="config-divider"></div>
+
+          <label class="preview-option" for="dry-run">
+            <span class="preview-check">
+              <input type="checkbox" id="dry-run" checked>
+              <span class="custom-check"></span>
+            </span>
+            <span class="preview-copy">
+              <strong>Preview mode</strong>
+              <small>Do not publish changes during this run.</small>
+            </span>
+            <span class="preview-badge">SAFE</span>
+          </label>
+
+          <div class="actions">
+            <button id="once" class="button-primary" type="button">
+              <span class="button-icon">▶</span>
+              <span>Process latest commit</span>
+              <span class="button-arrow">↗</span>
+            </button>
+            <button id="watch" class="button-secondary" type="button">
+              <span class="watch-symbol">◉</span>
+              Start continuous watch
+            </button>
+          </div>
+
+          <p class="action-footnote">
+            <span class="tiny-dot"></span>
+            Runs use your existing Watcher backend.
+          </p>
+        </div>
+
+        <div class="workflow-aside">
+          <section class="process-panel">
+            <div class="panel-topline">
+              <span class="panel-kicker">HOW IT WORKS</span>
+              <span class="panel-number">01 — 03</span>
+            </div>
+
+            <h3>From commit<br>to documentation.</h3>
+
+            <div class="process-list">
+              <div class="process-step">
+                <span class="step-marker">01</span>
+                <div class="step-content">
+                  <strong>Observe</strong>
+                  <p>Identify the latest repository changes.</p>
+                </div>
+                <span class="step-symbol">↗</span>
+              </div>
+
+              <div class="process-connector"></div>
+
+              <div class="process-step">
+                <span class="step-marker">02</span>
+                <div class="step-content">
+                  <strong>Interpret</strong>
+                  <p>Prepare documentation updates from the changes.</p>
+                </div>
+                <span class="step-symbol">⌘</span>
+              </div>
+
+              <div class="process-connector"></div>
+
+              <div class="process-step">
+                <span class="step-marker">03</span>
+                <div class="step-content">
+                  <strong>Review</strong>
+                  <p>Inspect the result before publishing.</p>
+                </div>
+                <span class="step-symbol">✓</span>
+              </div>
+            </div>
+
+            <div class="process-footer">
+              <span class="footer-star">✳</span>
+              <span>Human-readable. Reviewable. Controlled.</span>
+            </div>
+          </section>
+
+          <section class="principle-panel">
+            <span class="principle-mark">“</span>
+            <p>Documentation should follow the code, not fall behind it.</p>
+            <span class="principle-caption">THE WATCHER PRINCIPLE</span>
+          </section>
+        </div>
+      </section>
+
+      <div class="section-heading output-heading">
+        <div>
+          <span class="section-index">02</span>
+          <h2>Execution log</h2>
+        </div>
+        <button id="refresh" class="refresh-button" type="button">
+          <span>↻</span> Refresh status
+        </button>
+      </div>
+
+      <section class="output-panel" id="output">
+        <div class="output-topbar">
+          <div class="output-title">
+            <span class="terminal-icon">›_</span>
+            <div>
+              <strong>Run output</strong>
+              <small>LIVE BACKEND RESPONSE</small>
+            </div>
+          </div>
+          <span class="output-live">
+            <span class="tiny-dot"></span>
+            POLLED AUTOMATICALLY
+          </span>
+        </div>
+
+        <div class="output-context">
+          <span class="context-path">watcher / execution</span>
+          <span class="context-mode">STDOUT / STDERR</span>
+        </div>
+
+        <pre id="logs">Waiting for backend...</pre>
+
+        <div class="output-footer">
+          <span><span class="footer-square"></span> Output from your local workflow</span>
+          <span>Watcher · Documentation agent</span>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>WATCHER <span class="footer-separator">/</span> ENGINEERING WORKSPACE</span>
+        <span>Observe carefully. Document precisely.</span>
+      </footer>
+    </div>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

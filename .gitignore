@@ -2,3 +2,5 @@
 __pycache__/
 *.pyc
 .gitignore
+.docs-agent-state.json
+*.generated.md
