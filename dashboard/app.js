@@ -1,10 +1,17 @@
-
 const $ = id => document.getElementById(id);
 
+let toastTimer;
+
 function toast(message) {
-  $("toast").textContent = message;
-  $("toast").style.display = "block";
-  setTimeout(() => $("toast").style.display = "none", 3500);
+  const element = $("toast");
+
+  element.textContent = message;
+  element.classList.add("visible");
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(() => {
+    element.classList.remove("visible");
+  }, 3500);
 }
 
 async function api(path, options = {}) {
@@ -12,8 +19,13 @@ async function api(path, options = {}) {
     headers: { "Content-Type": "application/json" },
     ...options
   });
+
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.detail || "Request failed");
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Request failed");
+  }
+
   return data;
 }
 
@@ -31,19 +43,51 @@ async function refresh() {
     const data = await api("/api/status");
     const run = data.run;
 
-    $("connection").textContent = "Backend connected";
+    $("connection").innerHTML =
+      '<span class="connection-dot"></span>Backend connected';
+
+    $("connection").classList.remove("disconnected");
+    $("connection").classList.add("connected");
+
     $("repo").value = $("repo").value || data.default_repo || "";
     $("repo-metric").textContent = $("repo").value || "Not set";
+
     $("run-status").textContent = run.running
-      ? "Running…" : (run.kind ? "Finished" : "Idle");
+      ? "Running…"
+      : (run.kind ? "Finished" : "Idle");
+
     $("exit-code").textContent = run.exit_code ?? "—";
-    $("logs").textContent = run.error || run.output || "No run output yet.";
+
+    $("logs").textContent =
+      run.error || run.output || "No run output yet.";
+
+    const indicator = $("run-indicator");
+
+    indicator.classList.remove("running", "finished", "error");
+
+    if (run.running) {
+      indicator.classList.add("running");
+    } else if (run.error || (run.exit_code !== null &&
+                            run.exit_code !== undefined &&
+                            run.exit_code !== 0)) {
+      indicator.classList.add("error");
+    } else if (run.kind) {
+      indicator.classList.add("finished");
+    }
 
     $("once").disabled = run.running;
     $("watch").disabled = run.running;
   } catch (error) {
-    $("connection").textContent = "Backend unavailable";
+    $("connection").innerHTML =
+      '<span class="connection-dot"></span>Backend unavailable';
+
+    $("connection").classList.remove("connected");
+    $("connection").classList.add("disconnected");
+
     $("logs").textContent = error.message;
+
+    $("run-indicator").classList.remove("running", "finished");
+    $("run-indicator").classList.add("error");
   }
 }
 
@@ -53,6 +97,7 @@ async function run(path) {
       method: "POST",
       body: JSON.stringify(payload())
     });
+
     toast(data.message);
     refresh();
   } catch (error) {
