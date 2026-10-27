@@ -1,185 +1,344 @@
 # Watcher — AI-Powered Documentation Agent
 
-Automatically keep project documentation in sync with code changes. Watcher monitors a GitHub repository, analyzes new commits, uses an LLM to update only the affected documentation sections, and opens a pull request for review.
+Watcher is an AI-powered developer tool that monitors a GitHub repository, analyzes code changes, and proposes targeted README updates using a large language model (LLM). It can prepare documentation changes for review and supports publishing through a dedicated branch and pull request workflow.
 
-## Problem
+The project also includes a **Documentation Command Center**, a web dashboard for configuring and running documentation workflows.
 
-Documentation often becomes outdated as developers modify code, add endpoints, or change configuration. Updating documentation manually takes time and is easy to forget.
+## Table of Contents
 
-Watcher automates this workflow while preserving existing README content that does not need to change.
+- [Problem Statement](#problem-statement)
+- [Key Features](#key-features)
+- [How It Works](#how-it-works)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Environment Configuration](#environment-configuration)
+- [Usage](#usage)
+- [Documentation Command Center](#documentation-command-center)
+- [Example Workflow](#example-workflow)
+- [Safety and Review](#safety-and-review)
+- [Limitations](#limitations)
+- [Future Improvements](#future-improvements)
+- [Author](#author)
+
+## Problem Statement
+
+Documentation often becomes outdated when developers add features, modify functions, introduce endpoints, or change application configuration.
+
+Maintaining documentation manually takes time and is easy to forget. Rewriting an entire README for a small code change can also introduce unnecessary modifications.
+
+Watcher aims to automate this process by analyzing repository changes and using an LLM to identify documentation that may need updating while preserving unaffected content.
 
 ## Key Features
 
-- **GitHub monitoring:** Polls a repository for new commits at a configurable interval.
-- **Commit diff analysis:** Identifies changed files, additions, deletions, and patch content.
-- **AI-powered documentation:** Uses an LLM to determine which README sections need updating.
-- **Targeted README updates:** Preserves unaffected sections instead of rewriting the entire document.
-- **Automated pull requests:** Creates a documentation branch, commits meaningful changes, and opens a PR for review.
-- **Duplicate prevention:** Avoids creating unnecessary commits or pull requests when documentation has not meaningfully changed.
-- **Resilience:** Handles common API failures, rate limits, and retryable errors.
-- **Safe preview:** Supports generating a proposed README without immediately overwriting the existing file.
+- **GitHub repository monitoring:** Checks a configured repository for new commits.
+- **Commit and diff analysis:** Retrieves relevant changes to understand what changed in the codebase.
+- **AI-powered documentation:** Uses an LLM to propose documentation updates based on code changes.
+- **Targeted README updates:** Focuses on relevant documentation sections rather than unnecessarily rewriting the entire file.
+- **Automated publishing workflow:** Supports creating a documentation branch, committing changes, and opening a pull request when publishing is enabled.
+- **Preview mode:** Generates a proposed update without publishing changes.
+- **One-time processing:** Processes the current repository head and exits.
+- **Continuous monitoring:** Supports repeated repository checks through the watch command.
+- **Duplicate-change avoidance:** Checks whether a meaningful documentation update is needed before publishing.
+- **Configurable LLM provider:** Supports an OpenAI-compatible API endpoint, including the Gemini OpenAI-compatible endpoint.
+- **Documentation Command Center:** Provides a browser-based interface for configuring and running workflows.
+- **Reviewable output:** Produces a proposed documentation update and pull request description for review.
 
-## Workflow
+## How It Works
 
-1. Monitor the selected GitHub repository.
-2. Detect a new commit and retrieve its diff.
-3. Send the relevant code changes and current README to the LLM.
-4. Identify affected sections such as installation, usage, API reference, configuration, and changelog.
-5. Merge only the proposed section changes into the existing README.
-6. Check whether the documentation has meaningfully changed.
-7. Publish the updated documentation on a dedicated branch and open a pull request.
+1. Connects to the configured GitHub repository.
+2. Identifies the latest commit that needs processing.
+3. Retrieves the relevant commit information and code diff.
+4. Sends the current README and relevant changes to the configured LLM.
+5. Generates proposed documentation changes based on the code changes.
+6. Checks whether the proposed documentation contains meaningful changes.
+7. Displays the proposed update in preview mode or prepares it for publishing.
+8. When publishing is enabled, creates the documentation branch and pull request workflow.
+
+## Architecture
+
+```text
+GitHub Repository
+       |
+       v
+Repository Monitoring
+       |
+       v
+Commit and Diff Analysis
+       |
+       v
+Documentation Generator
+       |
+       v
+Configured LLM API
+       |
+       v
+Proposed README Update
+       |
+       v
+Change Review
+       |
+       +------ Preview Mode
+       |
+       +------ Publishing Workflow
+                    |
+                    v
+             Documentation Branch
+                    |
+                    v
+              Pull Request
+```
 
 ## Tech Stack
 
-- Python 3.13
-- PyGithub
-- Requests
-- python-dotenv
-- OpenAI-compatible LLM API
-- GitHub REST API
+- **Language:** Python 3.13
+- **GitHub integration:** PyGithub and GitHub APIs
+- **HTTP requests:** Requests
+- **Configuration:** python-dotenv
+- **AI integration:** OpenAI-compatible LLM API
+- **Web interface:** HTML, CSS, and JavaScript
+- **Backend:** Python dashboard server
 
 ## Project Structure
 
 ```text
-watcher/
+Watcher/
+├── main.py
 ├── watcher.py
 ├── docs_gen.py
 ├── publisher.py
-├── main.py
+├── dashboard_server.py
+├── dashboard/
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
 └── README.md
 ```
 
-## Setup
+The exact structure may vary slightly with your current branch. Keep the file tree aligned with the files actually committed to the repository.
+
+## Prerequisites
+
+Before running Watcher, make sure you have:
+
+- Python 3.10 or newer; Python 3.13 is the development version used for this project.
+- Git installed on your machine.
+- A GitHub repository you are authorized to access.
+- A GitHub token with the permissions needed for your intended operations.
+- An API key for a supported LLM provider.
+- Internet connectivity for GitHub and LLM API requests.
+
+## Installation
 
 ### 1. Clone the repository
+
+Replace the placeholders with your actual GitHub repository details.
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
 cd YOUR_REPOSITORY
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create a virtual environment
 
-Windows:
+Windows PowerShell:
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 ```
+
+If PowerShell blocks script execution, follow your machine's Python virtual-environment activation guidance rather than changing system-wide security settings unnecessarily.
 
 ### 3. Install dependencies
 
-```bash
-pip install -r requirements.txt
+```powershell
+python -m pip install -r requirements.txt
 ```
 
 ### 4. Configure environment variables
 
-Copy the example file:
+Create your local environment file:
 
 ```powershell
-copy .env.example .env
+Copy-Item .env.example .env
 ```
 
-Configure your credentials in `.env`:
+Edit `.env` with your own credentials and configuration.
+
+## Environment Configuration
+
+Example configuration for Gemini through its OpenAI-compatible endpoint:
 
 ```dotenv
 GITHUB_TOKEN=your_github_token
 GITHUB_REPO=YOUR_USERNAME/YOUR_REPOSITORY
 
-LLM_API_KEY=your_llm_api_key
-LLM_MODEL=your_supported_model
-LLM_BASE_URL=https://api.openai.com/v1
+LLM_API_KEY=your_gemini_api_key
+LLM_MODEL=gemini-2.5-flash
+LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 
 POLL_INTERVAL=30
 ```
 
-Use an LLM provider and model supported by your configured API endpoint. Keep `.env` out of version control.
+Configuration notes:
 
-The GitHub token needs the repository permissions required to read commits and create branches, commits, and pull requests.
+- `GITHUB_TOKEN` authenticates GitHub operations.
+- `GITHUB_REPO` identifies the repository in `owner/repository` format.
+- `LLM_API_KEY` contains your provider's API key.
+- `LLM_MODEL` identifies a model supported by your provider and account.
+- `LLM_BASE_URL` specifies the OpenAI-compatible API endpoint.
+- `POLL_INTERVAL` configures the intended polling interval where supported by the running workflow.
+
+Use a provider and model that are enabled for your account. The example above reflects the Gemini configuration used successfully during development; availability and usage limits depend on the provider.
+
+**Security:** Never commit `.env`, API keys, or access tokens. Keep `.env` ignored by Git and share only the placeholder-based `.env.example`.
+
+For publishing, ensure the GitHub token has sufficient permissions to read repository changes, create branches and commits, and open pull requests.
 
 ## Usage
 
-### Watch continuously
+Run commands from the Watcher project directory with the virtual environment activated.
 
-```bash
-python main.py watch
-```
+### Process the latest commit once
 
-### Watch with a shorter polling interval
-
-```bash
-python main.py watch YOUR_USERNAME/YOUR_REPOSITORY --interval 15
-```
-
-### Process the current latest commit once
-
-```bash
+```powershell
 python main.py once
 ```
 
-### Preview without publishing changes
+This processes the current repository head according to the configured repository and saved processing state.
 
-```bash
-python main.py watch --dry-run
+### Preview a documentation update
+
+```powershell
+python main.py once --dry-run
 ```
 
-### Run individual stages
+This is the recommended command for safely demonstrating Watcher. It generates and displays a proposed documentation update without publishing changes.
 
-Inspect a repository's latest commit:
+### Run continuous monitoring
 
-```bash
-python watcher.py YOUR_USERNAME/YOUR_REPOSITORY --once
+```powershell
+python main.py watch
 ```
 
-Generate a proposed README:
+The watch command runs the continuous monitoring workflow. Stop it using `Ctrl+C`.
 
-```bash
-python docs_gen.py YOUR_USERNAME/YOUR_REPOSITORY
+### Inspect available command options
+
+```powershell
+python main.py --help
+python main.py once --help
+python main.py watch --help
 ```
 
-Review the generated documentation before applying it. Use the generator's `--write` option only when you intend to update the local README.
+Use the options shown by your installed version. For example, the one-time command supports options such as `--readme`, `--path`, `--base`, `--model`, `--base-url`, and `--dry-run`.
 
-## Example Output
+### Select a repository explicitly
 
-After a code change is pushed, the workflow should produce output similar to:
+The one-time command accepts a repository argument:
+
+```powershell
+python main.py once YOUR_USERNAME/YOUR_REPOSITORY --dry-run
+```
+
+You can also configure `GITHUB_REPO` in `.env` instead.
+
+## Documentation Command Center
+
+Watcher includes a web dashboard called **Documentation Command Center**.
+
+The dashboard lets you configure and execute documentation workflows through a browser instead of relying exclusively on terminal commands.
+
+### Start the dashboard
+
+From the Watcher project folder:
+
+```powershell
+python dashboard_server.py
+```
+
+Open the dashboard at:
+
+http://127.0.0.1:8020
+
+### Dashboard capabilities
+
+- View backend connection status.
+- Configure the target GitHub repository.
+- Specify the README path.
+- Configure the polling interval.
+- Enable preview mode to avoid publishing changes.
+- Process the latest commit once.
+- Start continuous monitoring.
+- View workflow status and exit codes.
+- Inspect run output.
+
+The dashboard uses the Python backend to execute the documentation workflow. Keep API credentials on the backend; they should never be embedded in frontend JavaScript.
+
+### Verified development workflow
+
+During development, Watcher successfully processed a commit from `Roopesh431/BugHunter` using `gemini-2.5-flash` in preview mode.
+
+The run generated a proposed README update and a pull request description, and completed with exit code `0`.
+
+This demonstrates the preview workflow. A successful preview does not mean a branch or pull request was published.
+
+## Example Workflow
+
+A typical run may:
+
+1. Detect a new commit in a GitHub repository.
+2. Identify changed files and relevant code changes.
+3. Determine which documentation sections may be affected.
+4. Generate an updated README proposal.
+5. Show a summary of the proposed changes.
+6. Prepare a documentation branch and pull request when publishing is enabled.
+
+Example output below is illustrative; exact messages depend on the repository and the changes being processed.
 
 ```text
-New commit detected
-Changed files: 2
-Documentation impact: API usage and configuration
-README sections updated
-Documentation branch created
-Pull request opened
+Checking repository
+Reading README
+Analyzing commit changes
+Generating documentation update
+Preparing proposed README changes
+Preview completed
 ```
-
-This is illustrative output; actual messages depend on the run.
 
 ## Safety and Review
 
-- The existing README remains the source of truth.
-- Only sections supported by the code diff should change.
-- Unaffected sections are preserved.
-- Meaningful documentation changes are proposed through a pull request rather than silently merged into the default branch.
-- Review AI-generated documentation for correctness before merging.
+- Preview changes before publishing.
+- Review generated documentation for correctness.
+- Preserve content that is not supported by the code changes.
+- Keep API credentials out of the repository.
+- Do not merge generated documentation automatically without appropriate review.
+- Confirm the target repository and branch before enabling publishing.
+- Check the generated diff before merging a pull request.
 
 ## Limitations
 
-- Documentation quality depends on the available code diff, the README structure, and the configured LLM.
-- Binary files and incomplete GitHub diffs can limit what the agent understands.
-- API rate limits and LLM availability can delay processing.
-- The current publishing workflow targets the README; other documentation files may require additional integration.
+- Documentation quality depends on the code diff, existing README structure, and LLM output.
+- Large or incomplete diffs may limit the model's understanding of the change.
+- Provider rate limits, network errors, and API outages can interrupt processing.
+- LLM-generated documentation can contain inaccuracies and requires review.
+- The current workflow primarily targets README documentation.
+- Repository permissions may prevent branch creation or pull request publishing.
+- Continuous monitoring requires the process to remain running.
 
 ## Future Improvements
 
 - Support multiple documentation files.
 - Add automated documentation quality checks.
-- Integrate with CI/CD workflows.
-- Add a web dashboard for monitoring runs and pull requests.
-- Track documentation coverage and stale sections.
+- Integrate with CI/CD pipelines.
+- Improve run history and error reporting in the dashboard.
+- Add documentation freshness and coverage metrics.
+- Support configurable publishing policies and approval workflows.
 
 ## Author
 
